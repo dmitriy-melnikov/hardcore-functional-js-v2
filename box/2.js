@@ -1,4 +1,4 @@
-const Box = require("./box");
+const Box = require("./1");
 
 const first = xs => xs[0];
 

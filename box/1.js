@@ -1,10 +1,45 @@
-const nextCharForNumberString = str => {
+const { log } = console;
+/*const Box = x => (
+  {
+    map: f => Box(f(x)),
+    inspect: `Box(${x})`
+  }
+);
+
+const result = ['a']
+  .map(x => x.toUpperCase())
+  .map(x => String.fromCharCode(x));*/
+
+/*const result = () =>
+  Box('a')
+    .map(x => x.toUpperCase())
+    .map(x => String.fromCharCode(x));
+
+log(result());*/
+
+const Box = x => (
+	{
+		map: f => Box(f(x)),
+    fold: f => f(x),
+		toString: `Box(${x})`
+	});
+
+const nextCharForNumberString_ = str => {
   const trimmed = str.trim();
   const number = parseInt(trimmed);
-  const nextNumber = number + 1;
+  const nextNumber = new Number(number + 1);
   return String.fromCharCode(nextNumber);
 };
 
-const result = nextCharForNumberString("  64 ");
+const nextCharForNumberString = str =>
+  Box(str)
+    .map(x => x.trim())
+    .map(trimmed => parseInt(trimmed, 10))
+    .map(number => new Number(number + 1))
+    .fold(String.fromCharCode)
 
-console.log(result);
+
+const result = nextCharForNumberString("  64 ");
+log(result);
+module.exports = Box;
+
