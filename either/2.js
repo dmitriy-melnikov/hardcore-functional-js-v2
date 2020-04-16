@@ -1,35 +1,59 @@
+const fs = require('fs');
+
 const Right = x =>
 ({
   map: f => Right(f(x)),
+  chain: f => f(x),
   fold: (f, g) => g(x),
-  inspect: () => `Right(${x})`
-})
+  inspect: `Right(${x})`
+});
 
 const Left = x =>
 ({
   map: f => Left(x),
+  chain: f => Left(x),
   fold: (f, g) => f(x),
-  inspect: () => `Left(${x})`
-})
+  inspect: `Left(${x})`
+});
 
 const fromNullable = x =>
-  x != null ? Right(x) : Left(null)
+  x !== null ? Right(x) : Left(null);
+
+const tryCatch = f => {
+  try {
+    return Right(f())
+  } catch (e) {
+    return Left(e);
+  }
+};
+
+const readFileSync = path =>
+  tryCatch(() => fs.readFileSync(path));
+
+const parseJSON = contents =>
+  tryCatch(() => JSON.parse(contents));
 
 //=====================================
 
 
-const fs = require('fs')
-
-const getPort = () => {
+const getPort_ = () => {
   try {
-    const str = fs.readFileSync('config.json')
-    const config = JSON.parse(str)
+    const str = fs.readFileSync('config.json');
+    const config = JSON.parse(str);
     return config.port
   } catch(e) {
     return 3000
   }
-}
+};
 
-const result = getPort()
+const getPort = () =>
+  readFileSync('config.json')
+    .chain(contents => parseJSON(contents))
+    .map(config => config.port)
+    .fold(() => 8080, x => x);
 
-console.log(result)
+
+
+const result = getPort();
+
+console.log(result);
