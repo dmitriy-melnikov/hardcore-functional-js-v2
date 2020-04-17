@@ -1,4 +1,12 @@
 import apiKey from './apikey';
+const London = require('./london.json');
+
+fetch(`http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&APPID=${apiKey}`)
+  .then(res => London)
+  .then(console.log);
+
+
+/*
 import {getWeatherItems} from './model'
 
 const populateUI = (zip) =>
@@ -22,4 +30,4 @@ const app = () => {
   })
 }
 
-app()
+app()*/

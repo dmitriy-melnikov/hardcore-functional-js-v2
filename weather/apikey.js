@@ -1,2 +1,1 @@
-
-module.exports = "get this from openweather api"
+module.exports = "get this from openweather api";
