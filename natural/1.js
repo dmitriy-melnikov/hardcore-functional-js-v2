@@ -1,6 +1,13 @@
-const { Right, Left } = require('../either')
-const Box = require('../box')
-const Task = require('data.task')
+const fs = require('fs');
+const {Task, Either, Id }= require('../types');
+const {Right, Left, fromNullable} = Either;
+const { List, Map } = require('immutable-ext');
+const {error, log} = console;
+
+const logIt = x => {
+  log(x);
+  return x;
+};
 
 // nt(a.map(f)) == nt(a).map(f)
 const eitherToTask = e =>
@@ -11,7 +18,7 @@ const fake = id =>
 
 const Db = ({
   find: id =>
-    new Task((rej, res) =>
+    Task((rej, res) =>
       setTimeout(() =>
         res(id > 2 ? Right(fake(id)) : Left('not found')),
         100))
@@ -20,10 +27,12 @@ const Db = ({
 const send = (code, json) =>
   console.log(`sending ${code}: ${JSON.stringify(json)}`)
 
-Db.find(1)
-.chain(eu =>
-  eu.fold(e => Task.of(eu),
-          u => Db.find(u.best_friend_id)))
-.fork(error => send(500, {error}),
-      eu => eu.fold(error => send(404, {error}),
-                    x => send(200, x)))
+Db.find(3)
+.map(x => logIt(x))
+.chain(eitherToTask)
+.map(x => logIt(x))
+.chain( u => Db.find(u.best_friend_id))
+.chain(eitherToTask)
+.fork(
+  error => send(500, {error}),
+  x => send(200, x));
